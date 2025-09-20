@@ -60,7 +60,7 @@ And `locales/fr.json`:
 Run:
 
 ```bash
-npx i18n-lint ./locales --base en
+npx i18n-lint-cli ./locales --base en
 ```
 
 Output:
