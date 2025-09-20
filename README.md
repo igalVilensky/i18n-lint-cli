@@ -1,11 +1,11 @@
-# i18n-lint
+# i18n-lint-cli
 
 A CLI tool and Node library to **lint translation files** for i18n projects.  
 It detects:
 
-- ✅ Missing keys  
-- ✅ Extra/unused keys  
-- ✅ Placeholder mismatches (e.g., `{name}` vs `{username}`)  
+- ✅ Missing keys
+- ✅ Extra/unused keys
+- ✅ Placeholder mismatches (e.g., `{name}` vs `{username}`)
 
 Helps ensure your translations stay consistent and reduces runtime bugs.
 
@@ -13,10 +13,10 @@ Helps ensure your translations stay consistent and reduces runtime bugs.
 
 ## 🌟 Features
 
-- Works with **JSON** and **YAML** files.  
-- Supports **nested translation keys**.  
-- Outputs **colorful CLI messages** for easy debugging.  
-- Can be used in **CI/CD pipelines**.  
+- Works with **JSON** and **YAML** files.
+- Supports **nested translation keys**.
+- Outputs **colorful CLI messages** for easy debugging.
+- Can be used in **CI/CD pipelines**.
 
 ---
 
@@ -25,13 +25,13 @@ Helps ensure your translations stay consistent and reduces runtime bugs.
 Install as a dev dependency:
 
 ```bash
-npm install -D i18n-lint
+npm install -D i18n-lint-cli
 ```
 
 Or run without installing using npx:
 
 ```bash
-npx i18n-lint ./locales --base en
+npx i18n-lint-cli ./locales --base en
 ```
 
 ---
@@ -78,7 +78,7 @@ Exit code: `1` if errors are found (perfect for CI).
 You can also use it as a library:
 
 ```ts
-import { lintLocales } from "i18n-lint";
+import { lintLocales } from "i18n-lint-cli";
 
 const result = lintLocales("./locales", "en");
 console.log(result.errors);
@@ -89,8 +89,8 @@ Output:
 ```js
 [
   "[fr] Missing key: logout",
-  "[fr] Placeholder mismatch in greeting: expected {name}, found {username}"
-]
+  "[fr] Placeholder mismatch in greeting: expected {name}, found {username}",
+];
 ```
 
 ---
@@ -111,7 +111,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
       - run: npm ci
-      - run: npx i18n-lint ./locales --base en
+      - run: npx i18n-lint-cli ./locales --base en
 ```
 
 Fails the pipeline if missing keys or placeholder mismatches are detected.
