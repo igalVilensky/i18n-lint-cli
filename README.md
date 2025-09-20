@@ -1,5 +1,11 @@
 # i18n-lint-cli
 
+[![npm version](https://img.shields.io/npm/v/i18n-lint-cli)](https://www.npmjs.com/package/i18n-lint-cli)
+[![npm downloads](https://img.shields.io/npm/dw/i18n-lint-cli)](https://www.npmjs.com/package/i18n-lint-cli)
+[![license](https://img.shields.io/npm/l/i18n-lint-cli)](https://github.com/igalVilensky/i18n-lint-cli/blob/main/LICENSE)
+![npm total downloads](https://img.shields.io/npm/dt/i18n-lint-cli)
+![bundle size](https://img.shields.io/bundlephobia/minzip/i18n-lint-cli)
+
 A CLI tool and Node library to **lint translation files** for i18n projects.  
 It detects:
 
