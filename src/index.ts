@@ -1,1 +1,1 @@
-// programmatic API
+export { lintLocales } from "./check";

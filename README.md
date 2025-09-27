@@ -9,22 +9,18 @@
 A CLI tool and Node library to **lint translation files** for i18n projects.  
 It detects:
 
-- ✅ Missing keys
-- ✅ Extra/unused keys
-- ✅ Placeholder mismatches (e.g., `{name}` vs `{username}`)
+✅ Missing keys  
+✅ Extra/unused keys  
+✅ Placeholder mismatches (e.g., `{name}` vs `{username}`)
 
 Helps ensure your translations stay consistent and reduces runtime bugs.
-
----
 
 ## 🌟 Features
 
 - Works with **JSON** and **YAML** files.
-- Supports **nested translation keys**.
-- Outputs **colorful CLI messages** for easy debugging.
+- Supports **nested translation keys**.nested translation keys.
+- Outputs **colorful CLI messages** or **JSON** for easy debugging and CI parsing.
 - Can be used in **CI/CD pipelines**.
-
----
 
 ## 💻 Installation
 
@@ -39,8 +35,6 @@ Or run without installing using npx:
 ```bash
 npx i18n-lint-cli ./locales --base en
 ```
-
----
 
 ## ⚙️ Usage
 
@@ -63,21 +57,38 @@ And `locales/fr.json`:
 }
 ```
 
-Run:
+Run with default output:
 
 ```bash
 npx i18n-lint-cli ./locales --base en
 ```
 
-Output:
+**Output:**
 
-```yaml
+```
 ❌ Errors found:
  - [fr] Missing key: logout
  - [fr] Placeholder mismatch in greeting: expected {name}, found {username}
 ```
 
-Exit code: `1` if errors are found (perfect for CI).
+Run with JSON output:
+
+```bash
+npx i18n-lint-cli ./locales --base en --json
+```
+
+**Output:**
+
+```json
+{
+  "errors": [
+    "[fr] Missing key: logout",
+    "[fr] Placeholder mismatch in greeting: expected {name}, found {username}"
+  ]
+}
+```
+
+**Exit code**: `1` if errors are found (perfect for CI), `0` if no errors.
 
 ### Programmatic Usage
 
@@ -90,7 +101,7 @@ const result = lintLocales("./locales", "en");
 console.log(result.errors);
 ```
 
-Output:
+**Output:**
 
 ```js
 [
@@ -98,8 +109,6 @@ Output:
   "[fr] Placeholder mismatch in greeting: expected {name}, found {username}",
 ];
 ```
-
----
 
 ## 🏗️ CI/CD Integration
 
@@ -117,31 +126,31 @@ jobs:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
       - run: npm ci
-      - run: npx i18n-lint-cli ./locales --base en
+      - run: npx i18n-lint-cli ./locales --base en --json > lint-results.json
+      - name: Check lint results
+        run: |
+          if [ -s lint-results.json ]; then
+            if [ "$(jq '.errors | length' lint-results.json)" -gt 0 ]; then
+              echo "Translation errors found:"
+              cat lint-results.json
+              exit 1
+            fi
+          fi
 ```
 
-Fails the pipeline if missing keys or placeholder mismatches are detected.
-
-Keeps your translations safe before deployment.
-
----
+Fails the pipeline if missing keys or placeholder mismatches are detected. Keeps your translations safe before deployment.
 
 ## 🔧 Scripts
 
-- Build: `npm run build`
-- Dev mode (watch + build): `npm run dev`
-- Tests: `npm run test`
-
----
+- **Build**: `npm run build`
+- **Dev mode (watch + build)**: `npm run dev`
+- **Tests**: `npm run test`
 
 ## 📝 Roadmap / Ideas
 
 - Auto-fix missing keys with placeholder values.
 - Support `.po` files and other localization formats.
-- Add `--json` output mode for CI parsing.
 - Add ignore rules for specific keys or files.
-
----
 
 ## 📦 License
 
