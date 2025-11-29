@@ -18,7 +18,9 @@ Helps ensure your translations stay consistent and reduces runtime bugs.
 ## 🌟 Features
 
 - Works with **JSON** and **YAML** files.
-- Supports **nested translation keys**.nested translation keys.
+- Supports **nested translation keys**.
+- **Auto-fix** missing keys with placeholders.
+- Supports **ignore patterns** via `.i18nignore`.
 - Outputs **colorful CLI messages** or **JSON** for easy debugging and CI parsing.
 - Can be used in **CI/CD pipelines**.
 
@@ -71,6 +73,32 @@ npx i18n-lint-cli ./locales --base en
  - [fr] Placeholder mismatch in greeting: expected {name}, found {username}
 ```
 
+### Auto-fix
+
+Automatically add missing keys with a placeholder value (`__MISSING__`):
+
+```bash
+npx i18n-lint-cli ./locales --base en --fix
+```
+
+### Ignore Patterns
+
+Create a `.i18nignore` file to exclude specific keys:
+
+```
+# .i18nignore
+auth.secret
+legacy.*
+```
+
+Or specify a custom ignore file:
+
+```bash
+npx i18n-lint-cli ./locales --ignore-file .myignore
+```
+
+### JSON Output
+
 Run with JSON output:
 
 ```bash
@@ -95,10 +123,15 @@ npx i18n-lint-cli ./locales --base en --json
 You can also use it as a library:
 
 ```ts
-import { lintLocales } from "i18n-lint-cli";
+import { lintLocales, fixLocales } from "i18n-lint-cli";
 
+// Linting
 const result = lintLocales("./locales", "en");
 console.log(result.errors);
+
+// Fixing
+const fixResult = fixLocales("./locales", "en");
+console.log(fixResult.fixedFiles);
 ```
 
 **Output:**
@@ -148,9 +181,8 @@ Fails the pipeline if missing keys or placeholder mismatches are detected. Keeps
 
 ## 📝 Roadmap / Ideas
 
-- Auto-fix missing keys with placeholder values.
 - Support `.po` files and other localization formats.
-- Add ignore rules for specific keys or files.
+- Configurable placeholder format (currently `{name}`).
 
 ## 📦 License
 

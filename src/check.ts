@@ -12,7 +12,7 @@ function loadLocale(filePath: string): LocaleData {
   return JSON.parse(raw);
 }
 
-function walkKeys(obj: any, prefix = ""): string[] {
+export function walkKeys(obj: any, prefix = ""): string[] {
   if (typeof obj !== "object" || obj === null) return [prefix];
   return Object.keys(obj).flatMap((key) =>
     walkKeys(obj[key], prefix ? `${prefix}.${key}` : key)
@@ -35,38 +35,53 @@ function getValue(obj: any, pathStr: string): any {
   return pathStr.split(".").reduce((acc, key) => acc?.[key], obj);
 }
 
-export function lintLocales(dir: string, base: string) {
+import ignore from "ignore";
+
+export function loadLocales(dir: string): Record<string, LocaleData> {
   const files = fs
     .readdirSync(dir)
-    .filter((f) => f.endsWith(".json") || f.endsWith(".yaml"));
+    .filter((f) => f.endsWith(".json") || f.endsWith(".yaml") || f.endsWith(".yml"));
   const locales: Record<string, LocaleData> = {};
 
   files.forEach((file) => {
     const name = path.basename(file, path.extname(file));
     locales[name] = loadLocale(path.join(dir, file));
   });
+  return locales;
+}
 
+export function getMissingKeys(baseKeys: string[], targetKeys: string[]): string[] {
+  return baseKeys.filter((key) => !targetKeys.includes(key));
+}
+
+export function getExtraKeys(baseKeys: string[], targetKeys: string[]): string[] {
+  return targetKeys.filter((key) => !baseKeys.includes(key));
+}
+
+export function lintLocales(dir: string, base: string, ignorePatterns: string[] = []) {
+  const locales = loadLocales(dir);
   const baseData = locales[base];
+
   if (!baseData) {
     throw new Error(`Base locale '${base}' not found in ${dir}`);
   }
 
-  const baseKeys = walkKeys(baseData);
+  const ig = ignore().add(ignorePatterns);
+
+  const baseKeys = walkKeys(baseData).filter((k) => !ig.ignores(k));
   const errors: string[] = [];
 
   for (const [locale, data] of Object.entries(locales)) {
     if (locale === base) continue;
-    const keys = walkKeys(data);
+    const keys = walkKeys(data).filter((k) => !ig.ignores(k));
 
     // Missing keys
-    for (const key of baseKeys) {
-      if (!keys.includes(key)) errors.push(`[${locale}] Missing key: ${key}`);
-    }
+    const missing = getMissingKeys(baseKeys, keys);
+    missing.forEach(key => errors.push(`[${locale}] Missing key: ${key}`));
 
     // Extra keys
-    for (const key of keys) {
-      if (!baseKeys.includes(key)) errors.push(`[${locale}] Extra key: ${key}`);
-    }
+    const extra = getExtraKeys(baseKeys, keys);
+    extra.forEach(key => errors.push(`[${locale}] Extra key: ${key}`));
 
     // Placeholder check
     for (const key of baseKeys) {

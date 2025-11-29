@@ -13,9 +13,32 @@ program
   .argument("<dir>", "directory containing locale files")
   .option("--base <locale>", "base locale (default: en)", "en")
   .option("--json", "output results as JSON")
+  .option("--fix", "automatically fix missing keys")
+  .option("--ignore-file <path>", "path to ignore file (default: .i18nignore)")
   .action((dir, options) => {
     try {
-      const result = lintLocales(dir, options.base);
+      const fs = require("fs");
+      const path = require("path");
+      let ignorePatterns: string[] = [];
+      const ignoreFilePath = options.ignoreFile || path.join(process.cwd(), ".i18nignore");
+
+      if (fs.existsSync(ignoreFilePath)) {
+        ignorePatterns = fs.readFileSync(ignoreFilePath, "utf-8").split("\n").filter((l: string) => l.trim() && !l.startsWith("#"));
+      }
+
+      if (options.fix) {
+        const { fixLocales } = require("./fix");
+        const result = fixLocales(dir, options.base, ignorePatterns);
+        if (result.fixedFiles.length > 0) {
+          console.log("✅ Fixed files:");
+          result.fixedFiles.forEach((f: string) => console.log(" -", f));
+        } else {
+          console.log("✨ No files needed fixing.");
+        }
+        process.exit(0);
+      }
+
+      const result = lintLocales(dir, options.base, ignorePatterns);
       if (options.json) {
         console.log(JSON.stringify({ errors: result.errors }, null, 2));
       } else {
